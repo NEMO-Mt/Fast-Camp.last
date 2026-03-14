@@ -2,13 +2,14 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/database.php';
-
+// บันทึกการสมัครสมาชิก 
 function createRegistration(int $activityId, int $userId): bool
 {
     $conn = getConnection();
     $sql = 'INSERT INTO registrations (activity_id, user_id, status) VALUES (?, ?, "pending")';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ii', $activityId, $userId);
+    // เป็นส่วนป้องกันการสมัครกิจกรรมเดิมซ้ำ
     try {
         $result = $stmt->execute();
     } catch (mysqli_sql_exception $e) {
@@ -18,7 +19,7 @@ function createRegistration(int $activityId, int $userId): bool
     $conn->close();
     return $result;
 }
-
+// ดึวข้อมูลรายละเอียดการลงทะเบียน และดึงข้อมูลที่เกี่ยวข้องของผู้สมัคร, ดุึงกิจกรรมมา
 function getRegistrationById(int $regId): ?array
 {
     $conn = getConnection();
@@ -37,7 +38,7 @@ function getRegistrationById(int $regId): ?array
     $conn->close();
     return $registration ?: null;
 }
-
+// ดึงรายชือผุ้สมัครกิจกรรม
 function getRegistrationsByActivity(int $activityId): array
 {
     $conn = getConnection();
@@ -58,7 +59,7 @@ function getRegistrationsByActivity(int $activityId): array
     $conn->close();
     return $registrations;
 }
-
+// ดึงรายการกิจกรรมทั้งหมดที่ลงทะเบียนไว้
 function getRegistrationsByUser(int $userId): array
 {
     $conn = getConnection();
@@ -80,7 +81,7 @@ function getRegistrationsByUser(int $userId): array
     $conn->close();
     return $registrations;
 }
-
+// การกดยืนยัน/ปฏิเสธ การเข้าร่วมกิจกรรม
 function updateRegistrationStatus(int $regId, string $status, int $ownerId): bool
 {
     $conn = getConnection();
@@ -96,7 +97,7 @@ function updateRegistrationStatus(int $regId, string $status, int $ownerId): boo
     $conn->close();
     return $result && $affectedRows > 0;
 }
-
+// การยืนยันว่าคนนี้มาเข้าร่วมแล้ว
 function checkInRegistration(int $regId, int $ownerId): bool
 {
     $conn = getConnection();
@@ -112,13 +113,13 @@ function checkInRegistration(int $regId, int $ownerId): bool
     $conn->close();
     return $result && $affectedRows > 0;
 }
-
+// คำนวณข้อมูลสรุปให้เจ้าของกิจกรรม
 function getRegistrationStats(int $activityId): array
 {
     $conn = getConnection();
     
     $stats = [];
-    
+    // จำนวนคนสมัคร
     $sql = 'SELECT COUNT(*) as total FROM registrations WHERE activity_id = ?';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $activityId);
@@ -126,7 +127,7 @@ function getRegistrationStats(int $activityId): array
     $result = $stmt->get_result();
     $stats['total'] = $result->fetch_assoc()['total'];
     $stmt->close();
-    
+    // จำนวนคนรออนุมัติ
     $sql = 'SELECT COUNT(*) as pending FROM registrations WHERE activity_id = ? AND status = "pending"';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $activityId);
@@ -134,7 +135,7 @@ function getRegistrationStats(int $activityId): array
     $result = $stmt->get_result();
     $stats['pending'] = $result->fetch_assoc()['pending'];
     $stmt->close();
-    
+    // จำนวนคนที่ถูกอนุมัติ
     $sql = 'SELECT COUNT(*) as approved FROM registrations WHERE activity_id = ? AND status = "approved"';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $activityId);
@@ -142,7 +143,7 @@ function getRegistrationStats(int $activityId): array
     $result = $stmt->get_result();
     $stats['approved'] = $result->fetch_assoc()['approved'];
     $stmt->close();
-    
+    // จำนวนคนที่ถูกปฏิเสธ
     $sql = 'SELECT COUNT(*) as rejected FROM registrations WHERE activity_id = ? AND status = "rejected"';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $activityId);
@@ -150,7 +151,7 @@ function getRegistrationStats(int $activityId): array
     $result = $stmt->get_result();
     $stats['rejected'] = $result->fetch_assoc()['rejected'];
     $stmt->close();
-    
+    // คนที่ทำการเช็คชื่อ/เช็คอินไปแล้ว
     $sql = 'SELECT COUNT(*) as checked_in FROM registrations WHERE activity_id = ? AND is_checkin = 1';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $activityId);
@@ -158,7 +159,7 @@ function getRegistrationStats(int $activityId): array
     $result = $stmt->get_result();
     $stats['checked_in'] = $result->fetch_assoc()['checked_in'];
     $stmt->close();
-    
+    // วิเคราะห์แยกเพศ -> นับว่าแต่ละเพศมีกี่คน
     $sql = 'SELECT u.gender, COUNT(*) as count FROM registrations r 
             JOIN users u ON r.user_id = u.user_id 
             WHERE r.activity_id = ? AND r.status = "approved" 
@@ -172,7 +173,7 @@ function getRegistrationStats(int $activityId): array
         $stats['gender'][$row['gender']] = $row['count'];
     }
     $stmt->close();
-    
+    // แยกอายุแล้วทำการนับว่ามีอายุเท่าไหร่กี่คนบ้าง
     $sql = 'SELECT 
             CASE 
                 WHEN TIMESTAMPDIFF(YEAR, u.birthday, CURDATE()) < 18 THEN "under18"
@@ -199,7 +200,7 @@ function getRegistrationStats(int $activityId): array
     $conn->close();
     return $stats;
 }
-
+// เช็คว่าสมัครกิจกรรมนี้ไปหรือยัง
 function isUserRegistered(int $activityId, int $userId): ?array
 {
     $conn = getConnection();
