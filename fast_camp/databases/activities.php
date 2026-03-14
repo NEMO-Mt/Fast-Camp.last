@@ -133,6 +133,29 @@ function addActivityImage(int $activityId, string $imagePath): bool
     return $result;
 }
 
+function addActivityImages(int $activityId, array $imagePaths): int
+{
+    if (empty($imagePaths)) {
+        return 0;
+    }
+    
+    $conn = getConnection();
+    $sql = 'INSERT INTO activity_images (image_path, activity_id) VALUES (?, ?)';
+    $stmt = $conn->prepare($sql);
+    
+    $successCount = 0;
+    foreach ($imagePaths as $imagePath) {
+        $stmt->bind_param('si', $imagePath, $activityId);
+        if ($stmt->execute()) {
+            $successCount++;
+        }
+    }
+    
+    $stmt->close();
+    $conn->close();
+    return $successCount;
+}
+
 function getActivityImages(int $activityId): array
 {
     $conn = getConnection();
