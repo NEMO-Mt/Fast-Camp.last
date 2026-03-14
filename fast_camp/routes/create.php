@@ -14,6 +14,7 @@ $success = '';
 function uploadImages(array $files, int $activityId): array
 {
     $uploaded = [];
+    $imagePaths = [];
     $uploadDir = __DIR__ . '/../public/uploads/';
     
     if (!file_exists($uploadDir)) {
@@ -37,13 +38,18 @@ function uploadImages(array $files, int $activityId): array
             continue;
         }
         $ext = pathinfo($files['name'][$key], PATHINFO_EXTENSION);
-        $filename = 'activity_' . $activityId . '_' . bin2hex(random_bytes(4)) . '_' . time() . '.' . $ext;
+        $filename = 'activity_' . $activityId . '_' . bin2hex(random_bytes(4)) . '_' . time() . '_' . $key . '.' . $ext;
         $filepath = $uploadDir . $filename;
         
         if (move_uploaded_file($tmpName, $filepath)) {
-            addActivityImage($activityId, 'uploads/' . $filename);
+            $imagePaths[] = 'uploads/' . $filename;
             $uploaded[] = $filename;
         }
+    }
+    
+    // Add all images in a single database transaction
+    if (!empty($imagePaths)) {
+        addActivityImages($activityId, $imagePaths);
     }
     
     return $uploaded;
