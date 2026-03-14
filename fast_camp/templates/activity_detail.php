@@ -57,7 +57,7 @@
             <?php if (!empty($images)): ?>
                 <?php $firstImage = $images[0]; ?>
                 <div class="w-full h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-                    <img src="<?php echo htmlspecialchars($firstImage['image_path']); ?>" alt="Cover" class="w-full h-full object-cover">
+                    <img src="/<?php echo htmlspecialchars($firstImage['image_path']); ?>" alt="Cover" class="w-full h-full object-cover">
                 </div>
             <?php else: ?>
                 <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
@@ -139,7 +139,7 @@
                             <?php foreach ($images as $index => $image): ?>
                                 <?php if ($index > 0): ?>
                                 <div class="aspect-square rounded-xl overflow-hidden bg-gray-200">
-                                    <img src="<?php echo htmlspecialchars($image['image_path']); ?>" alt="Activity Image" class="w-full h-full object-cover hover:scale-110 transition cursor-pointer" onclick="openModal(this.src)">
+                                    <img src="/<?php echo htmlspecialchars($image['image_path']); ?>" alt="Activity Image" class="w-full h-full object-cover hover:scale-110 transition cursor-pointer" onclick="openModal(this.src)">
                                 </div>
                                 <?php endif; ?>
                             <?php endforeach; ?>
