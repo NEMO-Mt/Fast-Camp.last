@@ -11,8 +11,8 @@ function generateStatelessOtp(int $userId, int $activityId): array
     $timeWindow = (int)floor($currentTime / OTP_EXPIRY_SECONDS);
     $data = "{$userId}:{$activityId}:{$timeWindow}";
     $hash = hash_hmac('sha256', $data, OTP_SECRET_KEY);
-    $decimal = hexdec(substr($hash, 0, 16));
-    $otp = str_pad((string)($decimal % 1000000), OTP_LENGTH, '0', STR_PAD_LEFT);
+    $decimal = hexdec(substr($hash, 0, 8));
+    $otp = str_pad((string)(abs($decimal) % 1000000), OTP_LENGTH, '0', STR_PAD_LEFT);
     
     // Calculate expiry: end of current time window
     $windowStartTime = $timeWindow * OTP_EXPIRY_SECONDS;
@@ -33,15 +33,15 @@ function generateStatelessOtp(int $userId, int $activityId): array
 
 function verifyStatelessOtp(string $otpCode, int $userId, int $activityId): bool
 {
-    $otpCode = strtolower(trim($otpCode));
+    $otpCode = trim($otpCode);
     $currentWindow = floor(time() / OTP_EXPIRY_SECONDS);
     $windows = [$currentWindow, $currentWindow - 1];
     
     foreach ($windows as $window) {
         $data = "{$userId}:{$activityId}:{$window}";
         $hash = hash_hmac('sha256', $data, OTP_SECRET_KEY);
-        $decimal = hexdec(substr($hash, 0, 16));
-        $expectedOtp = str_pad((string)($decimal % 1000000), OTP_LENGTH, '0', STR_PAD_LEFT);
+        $decimal = hexdec(substr($hash, 0, 8));
+        $expectedOtp = str_pad((string)(abs($decimal) % 1000000), OTP_LENGTH, '0', STR_PAD_LEFT);
         if (hash_equals($expectedOtp, $otpCode)) {
             return true;
         }
