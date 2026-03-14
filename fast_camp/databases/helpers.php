@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 const OTP_SECRET_KEY = 'fastcamp_secret_key_2024';
-const OTP_EXPIRY_SECONDS = 1800; // 30 minutes
+const OTP_EXPIRY_SECONDS = 120; // 30 minutes
 const OTP_LENGTH = 6;
 
 function generateStatelessOtp(int $userId, int $activityId): array
