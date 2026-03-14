@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once DATABASES_DIR . '/activities.php';
 require_once DATABASES_DIR . '/registrations.php';
 require_once DATABASES_DIR . '/helpers.php';
-
+// เช็คการล็อกอิน
 if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
     exit;
@@ -21,10 +21,13 @@ if (!$activity) {
     header('Location: /home');
     exit;
 }
-
+// isOwner : check ความเป็นเจ้าของ
 $isOwner = $activity['owner_id'] == $_SESSION['user_id'];
+// เช็คสถานะว่ามีการสมัครกิจกรรมไปหรือยัง
 $registration = isUserRegistered($activityId, $_SESSION['user_id']);
+// การดึงรูปภาพในกิจกรรมนั้น
 $images = getActivityImages($activityId);
+
 $registrations = $isOwner ? getRegistrationsByActivity($activityId) : [];
 $stats = $isOwner ? getRegistrationStats($activityId) : [];
 
