@@ -74,9 +74,26 @@
                         <i class="fa-solid fa-location-dot text-accent"></i>
                         <span><?php echo htmlspecialchars($activity['location']); ?></span>
                     </div>
-                    <a href="/activity/<?php echo $activity['activity_id']; ?>" class="w-[90%] bg-secondary hover:bg-blue-200 text-primary font-bold py-2.5 rounded-2xl transition text-sm text-center">
-                        จัดการ
-                    </a>
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-2 mb-5">
+                        <a href="/activity/<?php echo $activity['activity_id']; ?>" class="w-full sm:w-[90%] bg-secondary hover:bg-blue-200 text-primary font-bold py-2.5 rounded-2xl transition text-sm text-center">
+                            จัดการ
+                        </a>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <a href="/edit?id=<?php echo $activity['activity_id']; ?>" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-3 rounded-xl transition text-sm text-center">
+                                <i class="fa-solid fa-pen"></i>
+                                <span class="hidden sm:inline">แก้ไข</span>
+                                <span class="sm:hidden">แก้</span>
+                            </a>
+                            <form method="POST" action="/delete" onsubmit="return confirm('ต้องการลบกิจกรรมนี้?');" class="flex-1">
+                                <input type="hidden" name="id" value="<?php echo $activity['activity_id']; ?>">
+                                <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-xl transition text-sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                    <span class="hidden sm:inline">ลบ</span>
+                                    <span class="sm:hidden">ลบ</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
                 <?php endforeach; ?>
             </div>
