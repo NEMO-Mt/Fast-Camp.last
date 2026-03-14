@@ -85,11 +85,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block font-bold mb-2">วันที่เริ่มกิจกรรม <span class="text-red-500">*</span></label>
-                        <input type="date" name="start_date" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary transition text-sm text-gray-500">
+                        <input type="date" name="start_date" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary transition text-sm text-gray-500" id="create_start_date">
                     </div>
                     <div>
                         <label class="block font-bold mb-2">วันที่สิ้นสุดกิจกรรม <span class="text-red-500">*</span></label>
-                        <input type="date" name="end_date" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary transition text-sm text-gray-500">
+                        <input type="date" name="end_date" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary transition text-sm text-gray-500" id="create_end_date">
                     </div>
                 </div>
 
@@ -131,6 +131,64 @@
                 });
             }
         }
+        
+        // Format date inputs to display dd/mm/yyyy
+        function formatDateInput(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            // Create a custom date input with dd/mm/yyyy display
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'relative';
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+            
+            // Create display input
+            const displayInput = document.createElement('input');
+            displayInput.type = 'text';
+            displayInput.placeholder = 'dd/mm/yyyy';
+            displayInput.className = input.className;
+            displayInput.style.cssText = input.style.cssText;
+            displayInput.readOnly = true;
+            
+            // Hide original input
+            input.style.position = 'absolute';
+            input.style.opacity = '0';
+            input.style.pointerEvents = 'none';
+            
+            // Insert display input before original
+            input.parentNode.insertBefore(displayInput, input);
+            
+            function updateDisplay() {
+                if (input.value) {
+                    const date = new Date(input.value);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                } else {
+                    displayInput.value = '';
+                }
+            }
+            
+            // Update display when value changes
+            input.addEventListener('change', updateDisplay);
+            
+            // Show date picker when display input is clicked
+            displayInput.addEventListener('click', () => {
+                input.focus();
+                input.showPicker?.();
+            });
+            
+            // Initial display update
+            updateDisplay();
+        }
+        
+        // Apply to both date inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            formatDateInput('create_start_date');
+            formatDateInput('create_end_date');
+        });
     </script>
 </body>
 </html>
