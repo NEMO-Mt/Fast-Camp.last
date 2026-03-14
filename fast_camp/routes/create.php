@@ -36,9 +36,8 @@ function uploadImages(array $files, int $activityId): array
         if ($fileSize > $maxSize) {
             continue;
         }
-        
         $ext = pathinfo($files['name'][$key], PATHINFO_EXTENSION);
-        $filename = 'activity_' . $activityId . '_' . time() . '_' . $key . '.' . $ext;
+        $filename = 'activity_' . $activityId . '_' . bin2hex(random_bytes(4)) . '_' . time() . '.' . $ext;
         $filepath = $uploadDir . $filename;
         
         if (move_uploaded_file($tmpName, $filepath)) {
