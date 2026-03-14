@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/database.php';
-//การสร้างกิจกรรม
+
 function createActivity(array $activity): int
 {
     $conn = getConnection();
@@ -10,13 +10,12 @@ function createActivity(array $activity): int
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('sssssi', $activity['title'], $activity['detail'], $activity['start_date'], $activity['end_date'], $activity['location'], $activity['owner_id']);
     $stmt->execute();
-    // ขอไอดีล่าสุด
     $activityId = $stmt->insert_id;
     $stmt->close();
     $conn->close();
     return $activityId;
 }
-// 
+
 function getActivityById(int $activityId): ?array
 {
     $conn = getConnection();
@@ -27,15 +26,13 @@ function getActivityById(int $activityId): ?array
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $activityId);
     $stmt->execute();
-    // เอาข้อมูลที่หาได้ทั้งหมดออกมา
     $result = $stmt->get_result();
-    // แปลงข้อมูลที่ได้จากฐานข้อมูลมาเป็น array fetch_assoc();
     $activity = $result->fetch_assoc();
     $stmt->close();
     $conn->close();
     return $activity ?: null;
 }
-// เป็นการดึงรายการกิจกรรมออกมา - user สามารถ จัดการกิจกรรมตัวเองได้
+
 function getActivitiesByOwner(int $ownerId): array
 {
     $conn = getConnection();
@@ -82,7 +79,7 @@ function searchActivities(?string $keyword = null, ?string $startDate = null, ?s
     }
     
     $sql .= ' ORDER BY a.start_date DESC';
-    // เช็คว่ามีการกรอกข้อมูลมั้ย
+    
     $stmt = $conn->prepare($sql);
     if (!empty($params)) {
         $stmt->bind_param($types, ...$params);
@@ -122,6 +119,18 @@ function deleteActivity(int $activityId, int $ownerId): bool
     $stmt->close();
     $conn->close();
     return $result && $affectedRows > 0;
+}
+
+function addActivityImage(int $activityId, string $imagePath): bool
+{
+    $conn = getConnection();
+    $sql = 'INSERT INTO activity_images (image_path, activity_id) VALUES (?, ?)';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('si', $imagePath, $activityId);
+    $result = $stmt->execute();
+    $stmt->close();
+    $conn->close();
+    return $result;
 }
 
 function addActivityImages(int $activityId, array $imagePaths): int

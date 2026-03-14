@@ -13,11 +13,7 @@ function generateOTP(int $userId, int $activityId): string
     $sql = 'INSERT INTO otps (otp_code, user_id, activity_id, expires_at) VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE otp_code = ?, expires_at = ?, is_used = 0, created_at = CURRENT_TIMESTAMP';
     $stmt = $conn->prepare($sql);
-<<<<<<< HEAD
-    $stmt->bind_param('siisss', $otp, $userId, $activityId, $expiresAt, $otp, $expiresAt);
-=======
     $stmt->bind_param('siisss', $otp, $userId, $expiresAt, $activityId, $otp, $expiresAt);
->>>>>>> Supakon
     $stmt->execute();
     $stmt->close();
     $conn->close();
