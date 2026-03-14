@@ -21,6 +21,7 @@ function uploadImages(array $files, int $activityId): array
         mkdir($uploadDir, 0777, true);
     }
     
+    
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $maxSize = 5 * 1024 * 1024; // 5MB
     

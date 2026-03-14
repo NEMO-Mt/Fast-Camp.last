@@ -124,7 +124,6 @@ function deleteActivity(int $activityId, int $ownerId): bool
     return $result && $affectedRows > 0;
 }
 
-c
 function addActivityImages(int $activityId, array $imagePaths): int
 {
     if (empty($imagePaths)) {
