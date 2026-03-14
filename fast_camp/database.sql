@@ -45,3 +45,16 @@ CREATE TABLE IF NOT EXISTS registrations (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     UNIQUE KEY unique_registration (activity_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS otps (
+    otp_id INT AUTO_INCREMENT PRIMARY KEY,
+    otp_code VARCHAR(6) NOT NULL,
+    user_id INT NOT NULL,
+    activity_id INT NOT NULL,
+    expires_at DATETIME NOT NULL,
+    is_used TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_activity (user_id, activity_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (activity_id) REFERENCES activities(activity_id) ON DELETE CASCADE
+);
