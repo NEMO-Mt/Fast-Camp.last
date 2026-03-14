@@ -7,16 +7,23 @@ const OTP_LENGTH = 6;
 
 function generateStatelessOtp(int $userId, int $activityId): array
 {
-    $timeWindow = floor(time() / OTP_EXPIRY_SECONDS);
+    $currentTime = time();
+    $timeWindow = (int)floor($currentTime / OTP_EXPIRY_SECONDS);
     $data = "{$userId}:{$activityId}:{$timeWindow}";
     $hash = hash_hmac('sha256', $data, OTP_SECRET_KEY);
     $decimal = hexdec(substr($hash, 0, 16));
     $otp = str_pad((string)($decimal % 1000000), OTP_LENGTH, '0', STR_PAD_LEFT);
-    $expiresAt = (int)(($timeWindow + 1) * OTP_EXPIRY_SECONDS);
-    $expiresIn = $expiresAt - time();
-    if ($expiresIn < 0) {
-        $expiresIn = OTP_EXPIRY_SECONDS - (time() % OTP_EXPIRY_SECONDS);
+    
+    // Calculate expiry: end of current time window
+    $windowStartTime = $timeWindow * OTP_EXPIRY_SECONDS;
+    $expiresAt = $windowStartTime + OTP_EXPIRY_SECONDS;
+    $expiresIn = $expiresAt - $currentTime;
+    
+    // Ensure expires_in is always positive (should be between 1 and OTP_EXPIRY_SECONDS)
+    if ($expiresIn <= 0) {
+        $expiresIn = OTP_EXPIRY_SECONDS;
     }
+    
     return [
         'code' => $otp,
         'expires_at' => date('Y-m-d H:i:s', $expiresAt),
