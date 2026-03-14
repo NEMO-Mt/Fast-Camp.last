@@ -52,22 +52,22 @@
 
     <main class="flex-grow p-8 max-w-7xl mx-auto w-full">
         <div class="bg-surface rounded-full py-3 px-6 flex flex-col md:flex-row justify-between items-center gap-4 mb-10 shadow-sm mx-auto max-w-5xl">
-            <form method="GET" action="/home" class="flex flex-col md:flex-row items-center gap-4 w-full">
-                <div class="relative w-full md:w-1/3">
+            <form method="GET" action="/home" class="flex flex-col items-center gap-4 w-full">
+                <div class="relative w-full">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-primary"></i>
                     <input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>" placeholder="ค้นหากิจกรรม" class="w-full pl-12 pr-4 py-2 rounded-full bg-white outline-none focus:ring-2 focus:ring-primary/30 shadow-inner">
                 </div>
-                <div class="flex items-center gap-4 text-sm font-medium">
+                <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-medium w-full">
                     <div class="flex items-center gap-2">
                         <label>วันที่เริ่ม:</label>
                         <div class="bg-white rounded-full px-4 py-1.5 flex items-center shadow-inner">
-                            <input type="date" name="start_date" value="<?php echo htmlspecialchars($startDate); ?>" class="outline-none text-gray-600 bg-transparent text-sm">
+                            <input type="date" name="start_date" value="<?php echo htmlspecialchars($startDate); ?>" class="outline-none text-gray-600 bg-transparent text-sm" id="start_date_input">
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
                         <label>วันที่สิ้นสุด:</label>
                         <div class="bg-white rounded-full px-4 py-1.5 flex items-center shadow-inner">
-                            <input type="date" name="end_date" value="<?php echo htmlspecialchars($endDate); ?>" class="outline-none text-gray-600 bg-transparent text-sm">
+                            <input type="date" name="end_date" value="<?php echo htmlspecialchars($endDate); ?>" class="outline-none text-gray-600 bg-transparent text-sm" id="end_date_input">
                         </div>
                     </div>
                     <button type="submit" class="bg-primary text-white px-4 py-1.5 rounded-full hover:bg-blue-800 transition">
@@ -90,7 +90,7 @@
             <div class="bg-white rounded-[30px] p-4 pb-5 shadow-sm hover:shadow-md transition flex flex-col items-center text-center border border-gray-50 h-full">
                 <?php if (!empty($actImages)): ?>
                 <div class="w-full h-40 bg-secondary rounded-[20px] mb-4 overflow-hidden">
-                    <img src="/<?php echo htmlspecialchars($actImages[0]['image_path']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-full object-cover">
+                    <img src="<?php echo htmlspecialchars($actImages[0]['image_path']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-full object-cover">
                 </div>
                 <?php else: ?>
                 <div class="w-full h-40 bg-secondary rounded-[20px] mb-4 flex items-center justify-center">
@@ -120,5 +120,65 @@
         </div>
         <?php endif; ?>
     </main>
+
+    <script>
+        // Format date inputs to display dd/mm/yyyy
+        function formatDateInput(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            // Create a custom date input with dd/mm/yyyy display
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'relative';
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+            
+            // Create display input
+            const displayInput = document.createElement('input');
+            displayInput.type = 'text';
+            displayInput.placeholder = 'dd/mm/yyyy';
+            displayInput.className = input.className;
+            displayInput.style.cssText = input.style.cssText;
+            displayInput.readOnly = true;
+            
+            // Hide original input
+            input.style.position = 'absolute';
+            input.style.opacity = '0';
+            input.style.pointerEvents = 'none';
+            
+            // Insert display input before original
+            input.parentNode.insertBefore(displayInput, input);
+            
+            function updateDisplay() {
+                if (input.value) {
+                    const date = new Date(input.value);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                } else {
+                    displayInput.value = '';
+                }
+            }
+            
+            // Update display when value changes
+            input.addEventListener('change', updateDisplay);
+            
+            // Show date picker when display input is clicked
+            displayInput.addEventListener('click', () => {
+                input.focus();
+                input.showPicker?.();
+            });
+            
+            // Initial display update
+            updateDisplay();
+        }
+        
+        // Apply to both date inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            formatDateInput('start_date_input');
+            formatDateInput('end_date_input');
+        });
+    </script>
 </body>
 </html>

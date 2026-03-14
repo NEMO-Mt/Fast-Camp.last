@@ -1,0 +1,13 @@
+RewriteEngine On
+
+# Route all requests to index.php except existing files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Set the default character encoding
+AddDefaultCharset UTF-8
+
+# Enable PHP error display for development
+php_flag display_errors On
+php_value error_reporting E_ALL

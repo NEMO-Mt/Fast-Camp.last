@@ -66,7 +66,7 @@
                     <div class="grid grid-cols-4 gap-3 mb-4">
                         <?php foreach ($images as $image): ?>
                         <div class="aspect-square rounded-xl overflow-hidden bg-gray-100 relative group">
-                            <img src="/<?php echo htmlspecialchars($image['image_path']); ?>" alt="Activity Image" class="w-full h-full object-cover">
+                            <img src="<?php echo htmlspecialchars($image['image_path']); ?>" alt="Activity Image" class="w-full h-full object-cover">
                         </div>
                         <?php endforeach; ?>
                     </div>

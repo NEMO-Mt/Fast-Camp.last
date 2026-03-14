@@ -58,7 +58,7 @@
                 <div class="bg-white rounded-[30px] p-4 pb-5 shadow-sm hover:shadow-md transition flex flex-col items-center text-center border border-gray-50 h-full">
                     <?php if (!empty($actImages)): ?>
                     <div class="w-full h-40 bg-secondary rounded-[20px] mb-4 overflow-hidden">
-                        <img src="/<?php echo htmlspecialchars($actImages[0]['image_path']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-full object-cover">
+                        <img src="<?php echo htmlspecialchars($actImages[0]['image_path']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-full object-cover">
                     </div>
                     <?php else: ?>
                     <div class="w-full h-40 bg-secondary rounded-[20px] mb-4 flex items-center justify-center">
